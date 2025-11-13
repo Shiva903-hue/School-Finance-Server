@@ -10,7 +10,8 @@ router.post("/transaction", async (req, res) => {
     trns_date,
     trns_status,
     voucher_id,
-    bank_id
+    bank_id,
+    trns_amount
   } = req.body;
 
   try {
@@ -22,16 +23,18 @@ router.post("/transaction", async (req, res) => {
     trns_date,
     trns_status,
     voucher_id,
-    bank_id
+    bank_id,
+    trns_amount
        )
-       VALUES (?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?,?)`,
       [
         transaction_type_id,
         transaction_details,
         trns_date,
         trns_status,
         voucher_id,
-        bank_id
+        bank_id,
+        trns_amount
       ]
     );
     res.json({ success: true, message: "Transaction requested successfully" });

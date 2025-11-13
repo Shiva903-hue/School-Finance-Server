@@ -2,12 +2,12 @@ import express from "express";
 import db from "../DataBase/DBConn.js";
 
 const router = express.Router();
-
+ 
 //* Fetch all city from DB
 router.get("/city", async (req, res) => {
   try {
     const [rows] = await db.promise().query(
-      "SELECT city_id, city_name FROM Tbl_city_master ORDER BY city_name ASC"
+      "SELECT * FROM Tbl_city_master"
     );
 
     if (rows.length === 0)
@@ -24,13 +24,14 @@ router.get("/city", async (req, res) => {
 router.get("/state", async (req, res) => {
   try {
     const [rows] = await db.promise().query(
-      "SELECT state_id, state_name FROM Tbl_state_master ORDER BY state_name ASC"
+      "SELECT * FROM tbl_state_master"
     );
 
     if (rows.length === 0)
       return res.status(404).json({ success: false, message: "No states found" });
 
     res.json({ success: true, states: rows });
+
   } catch (error) {
     console.error("Error fetching states:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -75,7 +76,7 @@ router.get("/vendor-names", async (req, res) => {
 router.get("/banks", async (req, res) => {
   try {
     const [rows] = await db.promise().query(
-      "SELECT bank_id, bank_name FROM tbl_bank_master ORDER BY bank_name ASC"
+      "SELECT bank_id, bank_name, bank_account_no FROM tbl_bank_master ORDER BY bank_name ASC"
     );
 
     if (rows.length === 0)

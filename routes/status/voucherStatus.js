@@ -15,7 +15,8 @@ router.get("/voucher-details", async (req, res) => {
         v.product_rate,
         v.product_amount,
         v.vendor_id,
-        d.vendor_name
+        d.vendor_name,
+        v.voucher_description
       FROM tbl_purchase_voucher_details AS v
       JOIN tbl_vendor_details AS d ON v.vendor_id = d.vendor_id
       ORDER BY v.voucher_id DESC`

@@ -40,7 +40,8 @@ router.get("/self", async (req, res) => {
       `SELECT 
     bank_id,
     bank_name,
-    bank_type
+    bank_type,
+    bank_amount
 FROM 
     tbl_bank_master
 WHERE 
