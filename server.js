@@ -15,7 +15,7 @@ import depositeRouter from "./routes/deposite.js";
 import withdrawalRouter from "./routes/withdrawal.js";
 import transactionInfoRouter from "./routes/status/trns-info.js";
 import transactionUpdateRouter from "./routes/update/transaction.js"; 
-
+import reportRouter from "./routes/Reports/reports.js";
 
 const app = express();
 app.use(express.json());
@@ -39,11 +39,17 @@ app.use("/api", vendorDetailsRouter);
 
 app.use("/bank", banlistRouter);
 
-// update routes
+//*update routes
 app.use("/api", voucherRouter);
 app.use("/api", transactionUpdateRouter);
 app.use("/api", depositeRouter);
 app.use("/api", withdrawalRouter);
+
+
+//* Report Routes 
+
+app.use("/api/reports", reportRouter);
+
 
 app.get("/", (req, res) => {
   res.send("Server is running");

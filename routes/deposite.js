@@ -15,21 +15,43 @@ router.post("/deposit", async (req, res) => {
   } = req.body;
 
   try {
+    const amount = parseFloat(Txn_amount);
+
+    // Step 1: Validate bank exists
+    const [bankRows] = await db.promise().query(
+      'SELECT bank_amount FROM tbl_bank_master WHERE bank_id = ?',
+      [Bank_id]
+    );
+
+    if (bankRows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Bank not found' });
+    }
+
+    // Step 2: Insert deposit transaction
     const [result] = await db.promise().query(
       "INSERT INTO tbl_self_transaction_details (Txn_type, Bank_id, Txn_amount, transaction_type_id, transaction_date, cheque_dd_number, rtgs_number) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         Txn_type,
         Bank_id,
-        Txn_amount,
+        amount,
         transaction_type_id,
         transaction_date,
         cheque_dd_number,
         rtgs_number
       ]
     );
-    res
-      .status(201)
-      .json({ success: true, message: "Deposit successful", Txn_Id: result.insertId });
+
+    // Step 3: Add amount to bank balance
+    await db.promise().query(
+      'UPDATE tbl_bank_master SET bank_amount = bank_amount + ? WHERE bank_id = ?',
+      [amount, Bank_id]
+    );
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Deposit successful and bank balance updated", 
+      Txn_Id: result.insertId 
+    });
   } catch (error) {
     console.error("Error processing deposit:", error);
     res.status(500).json({ success: false, message: "Internal server error", error: error.message });
