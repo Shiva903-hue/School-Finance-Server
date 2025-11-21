@@ -1,10 +1,11 @@
 import express from "express";
 import db from "../DataBase/DBConn.js";
+import { roleCheck } from "../middleware/auth.js";
 
 const router = express.Router();
  
 //* Fetch all city from DB
-router.get("/city", async (req, res) => {
+router.get("/city", roleCheck(['User','Banker','Superviser']) , async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       "SELECT * FROM Tbl_city_master"
@@ -21,7 +22,7 @@ router.get("/city", async (req, res) => {
 });
 
 //* get all states
-router.get("/state", async (req, res) => {
+router.get("/state",roleCheck(['User','Banker','Superviser']) , async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       "SELECT * FROM tbl_state_master"
@@ -39,7 +40,7 @@ router.get("/state", async (req, res) => {
 });
 
 //* get all vendor types */
-router.get("/vendor-types", async (req, res) => {
+router.get("/vendor-types",roleCheck(['User']) , async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       "SELECT vendor_type_id, vendor_type_name FROM tbl_vendor_type_master ORDER BY vendor_type_name ASC"
@@ -73,7 +74,7 @@ router.get("/vendor-names", async (req, res) => {
 });
 
 //* get banks types */
-router.get("/banks", async (req, res) => {
+router.get("/banks",roleCheck(['User','Banker']) , async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       "SELECT bank_id, bank_name, bank_account_no FROM tbl_bank_master ORDER BY bank_name ASC"
@@ -90,7 +91,7 @@ router.get("/banks", async (req, res) => {
 });
 
 //* get voucher ids with vendor names 
-router.get("/voucher-ids", async (req, res) => {
+router.get("/voucher-ids",roleCheck(['User','Superviser']) , async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       `SELECT 
@@ -98,6 +99,7 @@ router.get("/voucher-ids", async (req, res) => {
         pv.vendor_id, 
         pv.product_name, 
         pv.product_amount,
+        pv.voucher_status,
         COALESCE(vd.vendor_name, 'Unknown Vendor') as vendor_name
       FROM tbl_purchase_voucher_details pv
       LEFT JOIN tbl_vendor_details vd ON pv.vendor_id = vd.vendor_id
@@ -115,7 +117,7 @@ router.get("/voucher-ids", async (req, res) => {
 });
 
 //* get transaction types
-router.get("/transaction-types", async (req, res) => {
+router.get("/transaction-types",roleCheck(['User','Banker','Superviser']) , async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       "SELECT transaction_type_id,transaction_type FROM tbl_transaction_type_master ORDER BY transaction_type_id ASC"

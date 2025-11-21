@@ -1,9 +1,10 @@
 import express from "express";
 import db from "../DataBase/DBConn.js";
+import { roleCheck } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/add", async (req, res) => {
+router.post("/add",roleCheck(['User']), async (req, res) => {
   const {
     vendor_type_id,
     vendor_name,
@@ -17,10 +18,12 @@ router.post("/add", async (req, res) => {
     bank_id,
   } = req.body;
 
+  const created_by = req.session.user.user_id;
   try {
     await db.promise().query(
       `INSERT INTO tbl_vendor_details 
        (
+      user_id,
       vendor_type_id,
       vendor_name,
       vendor_mobile,
@@ -32,8 +35,8 @@ router.post("/add", async (req, res) => {
       vendor_address,
       bank_id
   )
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
+       VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?)`,
+      [created_by,
         vendor_type_id,
         vendor_name,
         vendor_mobile,
@@ -86,7 +89,7 @@ router.post("/add", async (req, res) => {
 // });
 
 //* UPDATE vendor by ID
-router.put('/:vendor_id', async (req, res) => {
+router.put('/:vendor_id',roleCheck(['User']), async (req, res) => {
   const { vendor_id } = req.params;
   const { 
     vendor_name, 

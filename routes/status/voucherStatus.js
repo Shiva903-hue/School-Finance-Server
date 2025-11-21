@@ -1,9 +1,10 @@
 import express from "express";
 import db from "../../DataBase/DBConn.js";
+import { roleCheck } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/voucher-details", async (req, res) => {
+router.get("/voucher-details",roleCheck(['User','Superviser']) ,async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       `SELECT 
@@ -15,10 +16,13 @@ router.get("/voucher-details", async (req, res) => {
         v.product_rate,
         v.product_amount,
         v.vendor_id,
+        v.user_id,
+        u.user_email,
         d.vendor_name,
         v.voucher_description
       FROM tbl_purchase_voucher_details AS v
       JOIN tbl_vendor_details AS d ON v.vendor_id = d.vendor_id
+      JOIN tbl_user_master AS u ON v.user_id = u.user_id
       ORDER BY v.voucher_id DESC`
     );
 

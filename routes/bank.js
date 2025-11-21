@@ -1,9 +1,10 @@
 import express from "express";
 import db from "../DataBase/DBConn.js";
+import { roleCheck } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/check-account/:accountNumber", (req, res) => {
+router.get("/check-account/:accountNumber",roleCheck(['User','Admin','Banker','Superviser']), (req, res) => {
   const { accountNumber } = req.params;
 
   db.query(
@@ -29,7 +30,7 @@ router.get("/check-account/:accountNumber", (req, res) => {
 });
 
 // Route 2: Add bank with duplicate check
-router.post("/add", (req, res) => {
+router.post("/add",roleCheck(['User','Admin','Banker','Superviser']), (req, res) => {
   const {
     bank_name,
     bank_account_no,
@@ -41,7 +42,7 @@ router.post("/add", (req, res) => {
     bank_type,
     bank_amount
   } = req.body;
-
+  const created_by = req.session.user.user_id;
   // First, check if account number already exists
   db.query(
     `SELECT bank_id FROM Tbl_bank_master WHERE bank_account_no = ?`,
@@ -66,9 +67,9 @@ router.post("/add", (req, res) => {
       // If unique, insert new bank record
       db.query(
         `INSERT INTO Tbl_bank_master 
-         (bank_name, bank_account_no, bank_ifsc, bank_branch, city_id, state_id, bank_address, bank_type, bank_amount)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [bank_name, bank_account_no, bank_ifsc, bank_branch, city_id, state_id, bank_address, bank_type, bank_amount],
+         (bank_name, bank_account_no, bank_ifsc, bank_branch, city_id, state_id,user_id, bank_address, bank_type, bank_amount)
+         VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?)`,
+        [bank_name, bank_account_no, bank_ifsc, bank_branch, city_id, state_id,created_by, bank_address, bank_type, bank_amount],
         (insertError, result) => {
           if (insertError) {
             console.error("Error creating bank:", insertError);

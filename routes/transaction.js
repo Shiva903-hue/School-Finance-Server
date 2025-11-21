@@ -1,9 +1,10 @@
 import express from "express";
 import db from "../DataBase/DBConn.js";
+import { roleCheck } from "../middleware/auth.js";
 
 const router = express.Router();
-
-router.post("/transaction", async (req, res) => {
+// http://localhost:8001/api/request/transaction
+router.post("/transaction", roleCheck(['User','Superviser','Banker']) ,async (req, res) => {
   const {
     transaction_type_id,
     transaction_details,
@@ -14,6 +15,8 @@ router.post("/transaction", async (req, res) => {
     trns_amount
   } = req.body;
 
+
+  const created_by = req.session.user.user_id;
   try {
     await db.promise().query(
       `INSERT INTO tbl_transaction_details
@@ -23,16 +26,18 @@ router.post("/transaction", async (req, res) => {
     trns_date,
     trns_status,
     voucher_id,
+    user_id,
     bank_id,
     trns_amount
        )
-       VALUES (?, ?, ?, ?, ?, ?,?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         transaction_type_id,
         transaction_details,
         trns_date,
         trns_status,
         voucher_id,
+        created_by,
         bank_id,
         trns_amount
       ]

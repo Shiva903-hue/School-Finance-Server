@@ -1,3 +1,5 @@
+import setupSession from './routes/session.js';
+
 import express from "express";
 import cors from "cors";
 import authRouter from "./authroute/auth.js";
@@ -18,8 +20,18 @@ import transactionUpdateRouter from "./routes/update/transaction.js";
 import reportRouter from "./routes/Reports/reports.js";
 
 const app = express();
+
+// SESSION - Must be before routes
+setupSession(app);
+
 app.use(express.json());
-app.use(cors());
+
+// CORS: allow your frontend origin 
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 
 
 app.use("/api/dropdown", dropdownrouter);

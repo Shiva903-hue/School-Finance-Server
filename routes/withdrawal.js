@@ -1,9 +1,10 @@
 import db from "../DataBase/DBConn.js";
 import express from "express";
+import { roleCheck } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/withdrawal", async (req, res) => {
+router.post("/withdrawal",roleCheck(['Banker']) ,async (req, res) => {
   const {
     Txn_type,
     Bank_id,
@@ -14,6 +15,7 @@ router.post("/withdrawal", async (req, res) => {
     rtgs_number
   } = req.body;
 
+  const created_by = req.session.user.user_id;
   try {
     const amount = parseFloat(Txn_amount);
 
@@ -41,11 +43,12 @@ router.post("/withdrawal", async (req, res) => {
 
     // Step 3: Insert withdrawal transaction
     const [result] = await db.promise().query(
-      "INSERT INTO tbl_self_transaction_details (Txn_type, Bank_id, Txn_amount, transaction_type_id, transaction_date, cheque_dd_number, rtgs_number) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO tbl_self_transaction_details (Txn_type, Bank_id, Txn_amount,User_id, transaction_type_id, transaction_date, cheque_dd_number, rtgs_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         Txn_type,
         Bank_id,
         amount,
+        created_by,
         transaction_type_id,
         transaction_date,
         cheque_dd_number,

@@ -1,10 +1,11 @@
 import express from "express";
 import db from "../../DataBase/DBConn.js";
+import { roleCheck } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 //* get vendor details
-router.get("/vendor-info", async (req, res) => {
+router.get("/vendor-info",roleCheck(['User','Superviser']), async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       "SELECT vendor_id, vendor_name, vendor_email, vendor_mobile, vendor_address FROM tbl_vendor_details ORDER BY vendor_id ASC"

@@ -14,6 +14,7 @@ router.post("/purchase-voucher", async (req, res) => {
     vendor_id
   } = req.body;
 
+  const created_by = req.session.user.user_id;
   try {
     await db.promise().query(
       `INSERT INTO tbl_purchase_voucher_details
@@ -24,9 +25,10 @@ router.post("/purchase-voucher", async (req, res) => {
     product_qty,
     product_rate,
     product_amount,
-    vendor_id
+    vendor_id,
+    user_id
   )
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?,?)`,
       [
         voucher_entry_date,
         voucher_status,
@@ -35,6 +37,7 @@ router.post("/purchase-voucher", async (req, res) => {
         product_rate,
         product_amount,
         vendor_id,
+        created_by
       ]
     );
     res.json({ success: true, message: "Purchase voucher added successfully" });

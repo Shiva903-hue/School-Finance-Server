@@ -1,9 +1,10 @@
 import db from "../../DataBase/DBConn.js";
 import express from "express";
+import { roleCheck } from "../../middleware/auth.js";
 
 const router = express.Router();
 //*fetch Banl list for Reports
-router.get("/list", async (req, res) => {
+router.get("/list",roleCheck(['User','Admin','Superviser','Banker']), async (req, res) => {
   try {
     const [rows] = await db.promise().query(
       `SELECT 

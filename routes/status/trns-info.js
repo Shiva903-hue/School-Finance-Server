@@ -1,14 +1,15 @@
 import db from "../../DataBase/DBConn.js";
 import express from 'express';
+import { roleCheck } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/trns-info", async (req, res) => {
+router.get("/trns-info",roleCheck(['User','Superviser','Banker']), async (req, res) => {
           try {
             const [rows] = await db.promise().query(
               `SELECT 
               
-              
+              t.transaction_id,
                 t.transaction_type_id,
                 tt.transaction_type,
                 t.transaction_details,

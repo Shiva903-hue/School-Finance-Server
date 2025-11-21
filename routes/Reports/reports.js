@@ -1,10 +1,11 @@
 import db from "../../DataBase/DBConn.js";
 import express from "express";
+import { roleCheck } from "../../middleware/auth.js";
 
 const router = express.Router();
 
 //* Route to get all Vendor Reports
-router.get("/vendor-report", async (req, res) => {
+router.get("/vendor-report", roleCheck(['User','Admin','Superviser','Banker']) ,async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
       SELECT
@@ -36,7 +37,7 @@ router.get("/vendor-report", async (req, res) => {
 });
 
 //* Route to get peticash report
-router.get("/pettycash-report", async (req, res) => {
+router.get("/pettycash-report",roleCheck(['User','Admin','Superviser','Banker']), async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
       SELECT 
@@ -58,7 +59,7 @@ LEFT JOIN tbl_bank_master AS b
 });
 
 //* Route to get User Info
-router.get("/user-report", async (req, res) => {
+router.get("/user-report",roleCheck(['User','Admin','Superviser','Banker']), async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
         SELECT 
@@ -79,7 +80,7 @@ router.get("/user-report", async (req, res) => {
 });
 
 //* Route to get Self Transaction Report
-router.get("/self-transaction-report", async (req,res)=>{
+router.get("/self-transaction-report",roleCheck(['User','Admin','Superviser','Banker']), async (req,res)=>{
               try {
     const [rows] = await db.promise().query(`
     SELECT 
@@ -106,7 +107,7 @@ JOIN
 })
 
 //* Route to get Purchase Voucher Report
-router.get("/purchase-voucher-report", async (req, res) => {
+router.get("/purchase-voucher-report",roleCheck(['User','Admin','Superviser','Banker']), async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
       SELECT
@@ -128,7 +129,7 @@ router.get("/purchase-voucher-report", async (req, res) => {
   }
 })
 //* Route to get Purchase Voucher Report
-router.get("/transaction-voucher-report", async (req, res) => {
+router.get("/transaction-voucher-report",roleCheck(['User','Admin','Superviser','Banker']), async (req, res) => {
   try {
     const [rows] = await db.promise().query(`
       SELECT

@@ -1,8 +1,9 @@
 import db from "../../DataBase/DBConn.js";
 import express from "express";
+import { roleCheck } from "../../middleware/auth.js";
 
 const router = express.Router();
-router.patch('/update/voucher/:id',  (req, res) => {
+router.patch('/update/voucher/:id',roleCheck(['Superviser']),  (req, res) => {
   const { id } = req.params;
   const { voucher_status, voucher_entry_date, voucher_description } = req.body;
   
